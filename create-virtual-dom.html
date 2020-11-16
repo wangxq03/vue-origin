@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>create virtual dom</title>
+</head>
+
+<body>
+    <div id="app">
+        <div class="box">
+            <p title="p"></p>
+        </div>
+        <ul>
+            <li>a</li>
+            <li>b</li>
+            <li>c</li>
+            <li>d</li>
+        </ul>
+    </div>
+    <script>
+        // 虚拟dom类
+        class VNode {
+            constructor(tag, data, value, type) {
+                this.tag = tag && tag.toLowerCase()
+                this.data = data
+                this.value = value
+                this.type = type
+                this.children = []
+            }
+
+            addChild(vnode) {
+                this.children.push(vnode)
+            }
+        }
+
+        // DOM -> 虚拟dom对象
+        function getVNode(node) {
+            let nodeType = node.nodeType
+            let _vnode = null
+            if (nodeType === 1) {
+                //元素节点
+                let nodeName = node.nodeName
+                let attrs = node.attributes
+                let attrObj = {}
+                for (let i = 0; i < attrs.length; i++) {
+                    attrObj[attrs[i].nodeName] = attrs[i].nodeValue
+
+                }
+                _vnode = new VNode(nodeName, attrObj, undefined, nodeType)
+
+                //node 有子元素
+                let childNodes = node.childNodes
+                for (let index = 0; index < childNodes.length; index++) {
+                    _vnode.addChild(getVNode(childNodes[index]))
+
+                }
+
+            } else if (nodeType === 3) {
+                _vnode = new VNode(undefined, undefined, node.nodeValue, nodeType)
+            }
+
+            return _vnode
+        }
+
+
+        //虚拟dom ->  真实DOM
+        function getRealDOM(vnode) {
+            let _node = null
+            let type = vnode.type
+            if (type === 3) {
+                //文本
+                _node = document.createTextNode(vnode.value)
+            } else if (type === 1) {
+                //元素
+                _node = document.createElement(vnode.tag)
+
+                //添加属性
+                let data = vnode.data
+                Object.keys(data).forEach(key => {
+                    let attrName = key
+                    let attrValue = data[key]
+                    _node.setAttribute(attrName, attrValue)
+                })
+
+                // 子元素
+                let children = vnode.children
+                children.forEach(subnode => {
+                    _node.appendChild(getRealDOM(subnode))
+                })
+
+            }
+            return _node
+        }
+        let app = document.querySelector('#app')
+        let vnode = getVNode(app)
+        console.log(vnode)
+
+        let realdom = getRealDOM(vnode)
+        console.log(realdom)
+
+
+        // 函数柯里化
+        // 函数式编程【https://llh911001.gitbooks.io/mostly-adequate-guide-chinese/content/】
+
+        // 1. 柯里化：一个函数有多个参数，只传入一个参数，返回一个函数，这个函数接收剩余参数
+        // 2. 偏函数：一个函数有多个参数， 只传一部分参数，返回一个函数， 这个函数接收剩余参数
+        // 3. 高阶函数： 一个函数的参数是 一个函数 ，该函数对这个函数参数加工，得到一个函数，这个加工用的函数就是高阶函数
+
+        // 为何使用柯里化？ 
+        // 提升性能，使用柯里化可以缓存一部分能力
+
+        // 解释：
+        // 1. 判断是否的内置标签元素 （div, a, p, h1等）
+        // 2. 虚拟dom的render方法
+
+
+        // 1. 判断是否的内置标签元素
+        /*
+        * Vue 本质上是使用HTML的字符串作为模板的，将字符串的 模板 转换成AST,再转换成VNode
+          - 模板 -> AST(最消耗性能)
+          - AST -> VNode
+          - VNode -> DOM
+        */
+    </script>
+</body>
+
+</html>

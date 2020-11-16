@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>write a likevue</title>
+</head>
+
+<body>
+    <div id="root">
+        <div>
+            <p>{{name}}</p>
+            <p>{{msg}}</p>
+        </div>
+    </div>
+    <script>
+        let tmpNode = document.querySelector('#root')
+        let data = {
+            name: 'sukey',
+            msg: 'write a vue program'
+        }
+
+        function Compiler(tmp, data) {
+            console.log(tmp)
+            const childNodes = tmp.childNodes
+            for (let i = 0; i < childNodes.length; i++) {
+                let element = childNodes[i].nodeValue;
+                let type = childNodes[i].nodeType
+                if (type === 3) {
+                    //文本节点
+                    element = element.replace(/\{\{(.+?)\}\}/g, (_, g) => {
+                        let key = g.trim()
+                        return data[key]
+                    })
+                } else if (type === 1) {
+                    //元素节点
+                    Compiler(childNodes[i], data)
+                }
+                childNodes[i].nodeValue = element
+
+            }
+        }
+        Compiler(tmpNode, data)
+    </script>
+</body>
+
+</html>
