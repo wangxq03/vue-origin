@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手写vue源码</title>
+    <script src="./Observer.js"></script>
+    <script src="./MVue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h2>{{person.name}} -- {{person.age}}</h2>
+        <h2>{{msg}} </h2>
+        <p v-text="msg"></p>
+        <p v-text="person.age"></p>
+        <p v-text="person.hobby"></p>
+        <p v-html="msg1"></p>
+        <p>{{msg}}</p>
+        <input type="text" v-model="msg" /><br>
+        <button v-on:click="handleClick">按钮</button><br>
+        <button @click="handleClick">按钮@</button>
+
+    </div>
+    <script>
+        let vm = new MVue({
+            el: "#app",
+            data: {
+                person: {
+                    name: 'sukey',
+                    age: 20,
+                    hobby: "read"
+                },
+                msg: "学习vue源码",
+                msg1: "<strong>学习vue源码</strong>",
+
+            },
+            methods: {
+                handleClick() {
+                    this.$data.person.name = "aa"
+                    console.log('click me lalala !')
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
